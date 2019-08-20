@@ -5,6 +5,8 @@ import (
 	"io"
 )
 
+const mask = 0x80
+
 func Encode(payload, carrier io.Reader, result io.Writer) error {
 	var (
 		p = make([]byte, 1)
@@ -28,14 +30,15 @@ func Encode(payload, carrier io.Reader, result io.Writer) error {
 			return errors.New("payload too large for carrier")
 		}
 
-		if n != len(p) {
+		if n != len(c) {
 			return errors.New("reading carrier")
 		} else if err != nil {
 			return err
 		}
 
 		for i, b := 0, p[0]; i < 8; i, b = i+1, b<<1 {
-			n, err := result.Write([]byte{b | c[i]})
+			encoded := b&mask | c[i]
+			n, err := result.Write([]byte{encoded})
 			if n != 1 {
 				return errors.New("writing result")
 			} else if err != nil {
@@ -46,6 +49,35 @@ func Encode(payload, carrier io.Reader, result io.Writer) error {
 	}
 
 	return nil
+}
+
+func read(payload, carrier io.Reader) ([]byte, []byte, error) {
+	var (
+		p = make([]byte, 1)
+		c = make([]byte, 8)
+	)
+
+	n, err := payload.Read(p)
+	if n < 1 {
+		return 0, 0, err
+	}
+
+	n, err = carrier.Read(c)
+	if n < 8 {
+		return 0, 0, errors.New("payload too large for carrier")
+	} else if err != nil && err != io.EOF {
+		return 0, 0, err
+	}
+
+	if err == io.EOF {
+		return errors.New("payload too large for carrier")
+	}
+
+	if n != len(c) {
+		return errors.New("reading carrier")
+	} else if err != nil {
+		return err
+	}
 }
 
 func Decode(data io.Reader, result io.Writer) error {

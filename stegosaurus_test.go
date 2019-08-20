@@ -11,10 +11,10 @@ import (
 
 func TestEncode(t *testing.T) {
 	var (
-		payload  = bytes.NewReader([]byte{0x55}) // 0b01010101
+		payload  = bytes.NewReader([]byte{0x55}) // 0101 0101
 		carrier  = bytes.NewReader(make([]byte, 8))
-		result   = bytes.NewBuffer(make([]byte, 8))
-		expected = []byte{0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01}
+		result   = bytes.NewBuffer(make([]byte, 0, 8))
+		expected = []byte{0x00, 0x80, 0x00, 0x80, 0x00, 0x80, 0x00, 0x80}
 	)
 
 	require.NoError(t, stegosaurus.Encode(payload, carrier, result))
