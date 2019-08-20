@@ -1,0 +1,3 @@
+package multireader_test
+
+func
