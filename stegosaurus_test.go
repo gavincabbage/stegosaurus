@@ -15,21 +15,28 @@ func TestEncode(t *testing.T) {
 		name     string
 		payload  io.Reader
 		carrier  io.Reader
-		result   io.ReadWriter
 		expected []byte
+		err      string
 	}{
 		{
 			name:     "happy path",
 			payload:  bytes.NewReader([]byte{0xde}),
 			carrier:  bytes.NewReader(make([]byte, 8)),
-			result:   bytes.NewBuffer(make([]byte, 0, 8)),
 			expected: []byte{0x01, 0x01, 0x00, 0x01, 0x01, 0x01, 0x01, 0x00},
+		},
+		{
+			name:    "happy path two bytes",
+			payload: bytes.NewReader([]byte{0xde, 0x55}),
+			carrier: bytes.NewReader(make([]byte, 16)),
+			expected: []byte{
+				0x01, 0x01, 0x00, 0x01, 0x01, 0x01, 0x01, 0x00,
+				0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01,
+			},
 		},
 		{
 			name:     "happy path non-zero carrier",
 			payload:  bytes.NewReader([]byte{0xde}),
 			carrier:  bytes.NewReader([]byte{0x41, 0xff, 0x00, 0x01, 0x01, 0x01, 0x01, 0x00}),
-			result:   bytes.NewBuffer(make([]byte, 0, 8)),
 			expected: []byte{0x41, 0xff, 0x00, 0x01, 0x01, 0x01, 0x01, 0x00},
 		},
 		{
@@ -39,18 +46,37 @@ func TestEncode(t *testing.T) {
 				0x01, 0x01, 0x00, 0x01, 0x01, 0x01, 0x01, 0x00,
 				0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x23,
 			}),
-			result: bytes.NewBuffer(make([]byte, 0, 16)),
 			expected: []byte{
 				0x01, 0x01, 0x00, 0x01, 0x01, 0x01, 0x01, 0x00,
 				0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x23,
 			},
 		},
+		{
+			name:     "error payload too large for carrier",
+			payload:  bytes.NewReader([]byte{0xde, 0xdd}),
+			carrier:  bytes.NewReader(make([]byte, 8)),
+			expected: []byte{0x01, 0x01, 0x00, 0x01, 0x01, 0x01, 0x01, 0x00},
+			err:      "payload too large for carrier",
+		},
+		{
+			name:     "error payload too large for carrier",
+			payload:  bytes.NewReader([]byte{0xde, 0xdd}),
+			carrier:  bytes.NewReader(make([]byte, 8)),
+			expected: []byte{0x01, 0x01, 0x00, 0x01, 0x01, 0x01, 0x01, 0x00},
+			err:      "payload too large for carrier",
+		},
 	}
 
 	for _, test := range cases {
 		t.Run(test.name, func(t *testing.T) {
-			require.NoError(t, stegosaurus.Encode(test.payload, test.carrier, test.result))
-			actual, _ := ioutil.ReadAll(test.result)
+			result := bytes.NewBuffer([]byte{})
+			err := stegosaurus.Encode(test.payload, test.carrier, result)
+			if test.err != "" {
+				require.EqualError(t, err, test.err)
+			} else {
+				require.NoError(t, err)
+			}
+			actual, _ := ioutil.ReadAll(result)
 			require.Equal(t, test.expected, actual)
 		})
 	}
@@ -66,7 +92,6 @@ func TestDecode(t *testing.T) {
 		{
 			name:     "happy path",
 			data:     bytes.NewReader([]byte{0x01, 0x01, 0x00, 0x01, 0x01, 0x01, 0x01, 0x00}),
-			result:   bytes.NewBuffer(make([]byte, 0, 8)),
 			expected: []byte{0xde},
 		},
 		{
@@ -75,15 +100,15 @@ func TestDecode(t *testing.T) {
 				0x01, 0x01, 0x00, 0x01, 0x01, 0x01, 0x01, 0x00,
 				0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x23,
 			}),
-			result:   bytes.NewBuffer(make([]byte, 0, 16)),
 			expected: []byte{0xde, 0x03},
 		},
 	}
 
 	for _, test := range cases {
 		t.Run(test.name, func(t *testing.T) {
-			require.NoError(t, stegosaurus.Decode(test.data, test.result))
-			actual, _ := ioutil.ReadAll(test.result)
+			result := bytes.NewBuffer([]byte{})
+			require.NoError(t, stegosaurus.Decode(test.data, result))
+			actual, _ := ioutil.ReadAll(result)
 			require.Equal(t, test.expected, actual)
 		})
 	}
