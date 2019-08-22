@@ -20,13 +20,13 @@ func TestEncode(t *testing.T) {
 	}{
 		{
 			name:     "happy path",
-			payload:  bytes.NewReader([]byte{0xde}),
+			payload:  bytes.NewReader([]byte{0b11011110}),
 			carrier:  bytes.NewReader(make([]byte, 8)),
 			expected: []byte{0x01, 0x01, 0x00, 0x01, 0x01, 0x01, 0x01, 0x00},
 		},
 		{
 			name:    "happy path two bytes",
-			payload: bytes.NewReader([]byte{0xde, 0x55}),
+			payload: bytes.NewReader([]byte{0b11011110, 0x55}),
 			carrier: bytes.NewReader(make([]byte, 16)),
 			expected: []byte{
 				0x01, 0x01, 0x00, 0x01, 0x01, 0x01, 0x01, 0x00,
@@ -35,13 +35,13 @@ func TestEncode(t *testing.T) {
 		},
 		{
 			name:     "happy path non-zero carrier",
-			payload:  bytes.NewReader([]byte{0xde}),
+			payload:  bytes.NewReader([]byte{0b11011110}),
 			carrier:  bytes.NewReader([]byte{0x41, 0xff, 0x00, 0x01, 0x01, 0x01, 0x01, 0x00}),
 			expected: []byte{0x41, 0xff, 0x00, 0x01, 0x01, 0x01, 0x01, 0x00},
 		},
 		{
 			name:    "happy path extra carrier",
-			payload: bytes.NewReader([]byte{0xde}),
+			payload: bytes.NewReader([]byte{0b11011110}),
 			carrier: bytes.NewReader([]byte{
 				0x01, 0x01, 0x00, 0x01, 0x01, 0x01, 0x01, 0x00,
 				0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x23,
@@ -53,17 +53,10 @@ func TestEncode(t *testing.T) {
 		},
 		{
 			name:     "error payload too large for carrier",
-			payload:  bytes.NewReader([]byte{0xde, 0xdd}),
+			payload:  bytes.NewReader([]byte{0b11011110, 0xdd}),
 			carrier:  bytes.NewReader(make([]byte, 8)),
 			expected: []byte{0x01, 0x01, 0x00, 0x01, 0x01, 0x01, 0x01, 0x00},
-			err:      "payload too large for carrier",
-		},
-		{
-			name:     "error payload too large for carrier",
-			payload:  bytes.NewReader([]byte{0xde, 0xdd}),
-			carrier:  bytes.NewReader(make([]byte, 8)),
-			expected: []byte{0x01, 0x01, 0x00, 0x01, 0x01, 0x01, 0x01, 0x00},
-			err:      "payload too large for carrier",
+			err:      "stegosaurus: encode: payload too large for carrier",
 		},
 	}
 
@@ -92,7 +85,7 @@ func TestDecode(t *testing.T) {
 		{
 			name:     "happy path",
 			data:     bytes.NewReader([]byte{0x01, 0x01, 0x00, 0x01, 0x01, 0x01, 0x01, 0x00}),
-			expected: []byte{0xde},
+			expected: []byte{0b11011110},
 		},
 		{
 			name: "happy path extra carrier",
@@ -100,7 +93,7 @@ func TestDecode(t *testing.T) {
 				0x01, 0x01, 0x00, 0x01, 0x01, 0x01, 0x01, 0x00,
 				0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x23,
 			}),
-			expected: []byte{0xde, 0x03},
+			expected: []byte{0b11011110, 0x03},
 		},
 	}
 
