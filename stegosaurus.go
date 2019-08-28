@@ -28,12 +28,12 @@ func Encode(payload, carrier io.Reader, result io.Writer) error {
 		n, err = carrier.Read(c)
 		if n < 8 {
 			if err == io.EOF {
-				return errors.New("stegosaurus: encode: payload too large for carrier")
+				return errors.New("payload too large for carrier")
 			} else if err != nil {
 				return err
 			}
 
-			return errors.New("stegosaurus: encode: reading carrier")
+			return errors.New("reading carrier")
 		}
 
 		for i, b := 8, p[0]; i > 0; i, b = i-1, b>>1 {
@@ -42,18 +42,18 @@ func Encode(payload, carrier io.Reader, result io.Writer) error {
 
 		_, err = result.Write(r)
 		if err != nil {
-			return fmt.Errorf("stegosaurus: encode: writing result: %w", err)
+			return fmt.Errorf("writing result: %w", err)
 		}
 	}
 
 	b, err := ioutil.ReadAll(carrier)
 	if err != nil {
-		return fmt.Errorf("stegosaurus: encode: reading remaining carrier: %w", err)
+		return fmt.Errorf("reading remaining carrier: %w", err)
 	}
 
 	_, err = result.Write(b)
 	if err != nil {
-		return fmt.Errorf("stegosaurus: encode: writing remaining carrier: %w", err)
+		return fmt.Errorf("writing remaining carrier: %w", err)
 	}
 
 	return nil
@@ -67,7 +67,7 @@ func Decode(data io.Reader, result io.Writer) error {
 		n, err := data.Read(d)
 		if n < 8 {
 			if err != io.EOF {
-				return fmt.Errorf("stegosaurus: decode: reading data: %w", err)
+				return fmt.Errorf("reading data: %w", err)
 			}
 
 			break
@@ -83,7 +83,7 @@ func Decode(data io.Reader, result io.Writer) error {
 
 		_, err = result.Write([]byte{b})
 		if err != nil {
-			return fmt.Errorf("stegosaurus: decode: writing result: %w", err)
+			return fmt.Errorf("writing result: %w", err)
 		}
 	}
 

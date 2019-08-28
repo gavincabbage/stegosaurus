@@ -6,8 +6,9 @@ import (
 	"io/ioutil"
 	"testing"
 
-	"github.com/gavincabbage/stegosaurus"
 	"github.com/stretchr/testify/require"
+
+	"github.com/gavincabbage/stegosaurus"
 )
 
 func TestEncode(t *testing.T) {
@@ -26,7 +27,7 @@ func TestEncode(t *testing.T) {
 		},
 		{
 			name:    "happy path two bytes",
-			payload: bytes.NewReader([]byte{0b11011110, 0x55}),
+			payload: bytes.NewReader([]byte{0b11011110, 0b01010101}),
 			carrier: bytes.NewReader(make([]byte, 16)),
 			expected: []byte{
 				0x01, 0x01, 0x00, 0x01, 0x01, 0x01, 0x01, 0x00,
@@ -56,7 +57,7 @@ func TestEncode(t *testing.T) {
 			payload:  bytes.NewReader([]byte{0b11011110, 0xdd}),
 			carrier:  bytes.NewReader(make([]byte, 8)),
 			expected: []byte{0x01, 0x01, 0x00, 0x01, 0x01, 0x01, 0x01, 0x00},
-			err:      "stegosaurus: encode: payload too large for carrier",
+			err:      "payload too large for carrier",
 		},
 	}
 
