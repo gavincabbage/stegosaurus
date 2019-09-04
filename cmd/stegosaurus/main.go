@@ -38,6 +38,7 @@ func main() {
 		os.Exit(1)
 	}
 }
+
 func reader(s string) (io.Reader, error) {
 	if strings.HasPrefix(s, "@") {
 		d, err := ioutil.ReadFile(strings.TrimPrefix(s, "@"))
