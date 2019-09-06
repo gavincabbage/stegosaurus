@@ -2,12 +2,12 @@ package main
 
 import (
 	"bytes"
-	"fmt"
-	"github.com/urfave/cli"
 	"io"
 	"io/ioutil"
 	"os"
 	"strings"
+
+	"github.com/urfave/cli"
 )
 
 // TODO Two issues:
@@ -17,7 +17,7 @@ import (
 // Second, bigger, is that using crazy data like an image in an argument (e.g. "--data cRaZy_ImAgE_dAtA") ends up including
 // escape characters and other shit, so it needs to come from a file or stdin, not a flag
 
-var version string
+var version = "dev"
 
 func main() {
 	app := cli.App{
@@ -32,11 +32,7 @@ func main() {
 		},
 	}
 
-	err := app.Run(os.Args)
-	if err != nil {
-		fmt.Println(fmt.Errorf("%s: %w", app.Name, err))
-		os.Exit(1)
-	}
+	cli.HandleExitCoder(app.Run(os.Args))
 }
 
 func reader(s string) (io.Reader, error) {
