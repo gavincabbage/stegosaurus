@@ -1,110 +1,52 @@
 package stegosaurus
 
 import (
-	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
+	"strings"
 )
 
-const mask = 0x01
-
-func Encode(payload, carrier io.Reader, result io.Writer) error {
-	var (
-		p = make([]byte, 1)
-		c = make([]byte, 8)
-		r = make([]byte, 8)
-	)
-	for {
-		n, err := payload.Read(p)
-		if n < 1 {
-			if err != io.EOF {
-				return err
-			}
-
-			break
-		}
-
-		n, err = carrier.Read(c)
-		if n < 8 {
-			if err == io.EOF {
-				return errors.New("payload too large for carrier")
-			} else if err != nil {
-				return err
-			}
-
-			return errors.New("reading carrier")
-		}
-
-		for i, b := 8, p[0]; i > 0; i, b = i-1, b>>1 {
-			r[i-1] = b&mask | c[i-1]
-		}
-
-		_, err = result.Write(r)
-		if err != nil {
-			return fmt.Errorf("writing result: %w", err)
-		}
-	}
-
-	b, err := ioutil.ReadAll(carrier)
-	if err != nil {
-		return fmt.Errorf("reading remaining carrier: %w", err)
-	}
-
-	_, err = result.Write(b)
-	if err != nil {
-		return fmt.Errorf("writing remaining carrier: %w", err)
-	}
-
-	return nil
+// ByteEncoder encodes and decodes secret payloads.
+type Encoder interface {
+	// Encode the secret payload into the carrier data.
+	Encode(payload, carrier io.Reader, data io.Writer) error
+	// Decode the secret payload from the carrier data.
+	Decode(data io.Reader, payload io.Writer) error
 }
 
-func Decode(data io.Reader, result io.Writer) error {
-	var (
-		d = make([]byte, 8)
-	)
-	for {
-		n, err := data.Read(d)
-		if n < 8 {
-			if err != io.EOF {
-				return fmt.Errorf("reading data: %w", err)
-			}
+// Algorithm represents tuple of byte selection and bit embedding algorithms.
+//
+// The selection algorithm determines how bytes in the carrier data are chosen
+// for embedding. The bit embedding algorithm determines how payload bits are
+// embedded into selected carrier bytes.
+//
+// An Algorithm is a string of the form `selection/embedding` where selection
+// represents the selection algorithm and embedding the bit embedding algorithm,
+// delimited by a forward slash.
+//
+// Available algorithms are determined by the ByteEncoder implementation.
+type Algorithm string
 
-			break
-		}
-
-		var b byte
-		for i := 0; i < 8; i++ {
-			b = d[i]&mask | b
-			if i < 7 {
-				b = b << 1
-			}
-		}
-
-		_, err = result.Write([]byte{b})
-		if err != nil {
-			return fmt.Errorf("writing result: %w", err)
-		}
-	}
-
-	return nil
+// NewAlgorithm formats a selection and embedding algorithm string.
+func NewAlgorithm(selection, embedding string) string {
+	return fmt.Sprintf("%s/%s", selection, embedding)
 }
 
-/*
+// Selection returns the Algorithm's selection algorithm.
+func (a Algorithm) Selection() string {
+	return a.parsed(0)
+}
 
-  LSBSteg.py encode -i <input> -o <output> -f <file>
-  LSBSteg.py decode -i <input> -o <output>
+// Embedding returns the Algorithm's embedding algorithm.
+func (a Algorithm) Embedding() string {
+	return a.parsed(1)
+}
 
---
+func (a Algorithm) parsed(i int) string {
+	s := strings.Split(string(a), "/")
+	if len(s) != 2 {
+		return ""
+	}
 
-The payload is the data covertly communicated. T
-
-he carrier is the signal, stream, or data file that hides the payload, which differs from
-the channel, which typically means the type of input, such as a JPEG image.
-
-The resulting signal, stream, or data file with the encoded payload is sometimes called the package, stego file, or covert message.
-
-The proportion of bytes, samples, or other signal elements modified to encode the payload is called
-the encoding density and is typically expressed as a number between 0 and 1.
-
-*/
+	return s[i]
+}
