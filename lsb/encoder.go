@@ -1,4 +1,4 @@
-package stegosaurus
+package lsb
 
 import (
 	"errors"
@@ -9,9 +9,9 @@ import (
 
 const mask = 0x01
 
-type ByteEncoder struct{}
+type Encoder struct{}
 
-func (_ ByteEncoder) Encode(payload, carrier io.Reader, result io.Writer) error {
+func (_ Encoder) Encode(payload, carrier io.Reader, result io.Writer) error {
 	var (
 		p = make([]byte, 1)
 		c = make([]byte, 8)
@@ -42,7 +42,6 @@ func (_ ByteEncoder) Encode(payload, carrier io.Reader, result io.Writer) error 
 			r[i-1] = b&mask | c[i-1]&^mask
 		}
 
-		fmt.Printf("writ %08b %s %08b %s\n", r, string(r), p, string(p))
 		_, err = result.Write(r)
 		if err != nil {
 			return fmt.Errorf("writing result: %w", err)
@@ -62,7 +61,7 @@ func (_ ByteEncoder) Encode(payload, carrier io.Reader, result io.Writer) error 
 	return nil
 }
 
-func (_ ByteEncoder) Decode(data io.Reader, result io.Writer) error {
+func (_ Encoder) Decode(data io.Reader, result io.Writer) error {
 	var (
 		d = make([]byte, 8)
 	)
@@ -78,14 +77,12 @@ func (_ ByteEncoder) Decode(data io.Reader, result io.Writer) error {
 
 		var b byte
 		for i := 0; i < 8; i++ {
-			//fmt.Printf("b %08b = d[i]&mask %08b | b %08b ... %s\n", d[i]&mask|b, d[i]&mask, b, string(b))
 			b = d[i]&mask | b
 			if i < 7 {
 				b = b << 1
 			}
 		}
 
-		fmt.Printf("writ %08b %s %08b %s\n", d, string(d), b, string(b))
 		_, err = result.Write([]byte{b})
 		if err != nil {
 			return fmt.Errorf("writing result: %w", err)

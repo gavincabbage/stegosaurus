@@ -8,11 +8,10 @@ import (
 	"os"
 	"strings"
 
-	"github.com/gavincabbage/stegosaurus/image"
-
 	"github.com/urfave/cli"
 
 	"github.com/gavincabbage/stegosaurus"
+	"github.com/gavincabbage/stegosaurus/image"
 )
 
 var version = "dev"

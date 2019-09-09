@@ -1,4 +1,4 @@
-package stegosaurus_test
+package lsb_test
 
 import (
 	"bytes"
@@ -7,9 +7,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/gavincabbage/stegosaurus/lsb"
 	"github.com/stretchr/testify/require"
-
-	"github.com/gavincabbage/stegosaurus"
 )
 
 func TestEncode(t *testing.T) {
@@ -66,7 +65,7 @@ func TestEncode(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			var (
 				result  = bytes.NewBuffer([]byte{})
-				subject = stegosaurus.ByteEncoder{}
+				subject = lsb.Encoder{}
 			)
 			err := subject.Encode(test.payload, test.carrier, result)
 			if test.err != "" {
@@ -106,7 +105,7 @@ func TestDecode(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			var (
 				result  = bytes.NewBuffer([]byte{})
-				subject = stegosaurus.ByteEncoder{}
+				subject = lsb.Encoder{}
 			)
 			require.NoError(t, subject.Decode(test.data, result))
 			actual, _ := ioutil.ReadAll(result)
@@ -117,7 +116,7 @@ func TestDecode(t *testing.T) {
 
 func TestEncodeDecode(t *testing.T) {
 	var (
-		subject = stegosaurus.ByteEncoder{}
+		subject = lsb.Encoder{}
 		result  = bytes.NewBuffer([]byte{})
 		payload = "abcdefgh"
 		carrier = "1234567812345678123456781234567812345678123456781234567812345678"
