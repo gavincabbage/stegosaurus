@@ -10,8 +10,8 @@ import (
 
 	"github.com/urfave/cli"
 
-	"github.com/gavincabbage/stegosaurus"
-	"github.com/gavincabbage/stegosaurus/image"
+	"gavincabbage.com/stegosaurus"
+	"gavincabbage.com/stegosaurus/image"
 )
 
 var version = "dev"

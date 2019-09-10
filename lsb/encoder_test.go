@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/gavincabbage/stegosaurus/lsb"
+	"gavincabbage.com/stegosaurus/lsb"
 	"github.com/stretchr/testify/require"
 )
 

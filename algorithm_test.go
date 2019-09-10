@@ -5,7 +5,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/gavincabbage/stegosaurus"
+	"gavincabbage.com/stegosaurus"
 )
 
 func TestAlgorithm(t *testing.T) {

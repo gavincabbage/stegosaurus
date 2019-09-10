@@ -3,9 +3,8 @@ package image
 import (
 	"io"
 
-	"github.com/gavincabbage/stegosaurus/lsb"
-
-	"github.com/gavincabbage/stegosaurus"
+	"gavincabbage.com/stegosaurus"
+	"gavincabbage.com/stegosaurus/lsb"
 )
 
 type Encoder struct {
