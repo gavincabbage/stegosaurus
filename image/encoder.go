@@ -3,18 +3,15 @@ package image
 import (
 	"io"
 
-	"gavincabbage.com/stegosaurus"
 	"gavincabbage.com/stegosaurus/lsb"
 )
 
 type Encoder struct {
-	alg stegosaurus.Algorithm
 	key []byte
 }
 
-func NewEncoder(algorithm stegosaurus.Algorithm, key []byte) Encoder {
+func NewEncoder(_ string, key []byte) Encoder {
 	return Encoder{
-		alg: algorithm,
 		key: key,
 	}
 }
