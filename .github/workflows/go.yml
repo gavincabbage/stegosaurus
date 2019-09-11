@@ -19,7 +19,7 @@ jobs:
     - name: Fetch dependencies
       run: go mod download
       env:
-        - GOPROXY: direct
+        GOPROXY: direct
 
     - name: Test
       run: go test -v ./...
