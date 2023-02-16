@@ -46,7 +46,7 @@ func main() {
 	if a := os.Getenv("PORT"); a != "" {
 		i, err := strconv.Atoi(a)
 		if err != nil {
-			logger.Println("invalid port %s", a)
+			logger.Printf("invalid port %s\n", a)
 		}
 
 		addr = fmt.Sprintf(":%d", i)
