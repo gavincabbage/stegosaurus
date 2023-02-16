@@ -13,9 +13,8 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/gavincabbage/stegosaurus/image"
-
 	"github.com/gavincabbage/stegosaurus"
+	"github.com/gavincabbage/stegosaurus/image"
 )
 
 func main() {
@@ -74,7 +73,9 @@ func main() {
 	case <-ctx.Done():
 	}
 
-	timeout, _ := context.WithTimeout(ctx, 5*time.Second)
+	timeout, forceShutdown := context.WithTimeout(ctx, 5*time.Second)
+	defer forceShutdown()
+
 	if err := server.Shutdown(timeout); err != nil {
 		logger.Fatal(err)
 	}
@@ -115,12 +116,9 @@ func encode() http.Handler {
 		}
 
 		if err := encoder.Encode(payload, r.Body, w); err != nil {
-			fmt.Println(err)
 			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 			return
 		}
-
-		w.WriteHeader(http.StatusOK)
 	})
 }
 
@@ -157,8 +155,6 @@ func decode() http.Handler {
 			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 			return
 		}
-
-		w.WriteHeader(http.StatusOK)
 	})
 }
 
