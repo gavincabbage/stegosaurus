@@ -3,14 +3,14 @@ package image
 import (
 	"io"
 
-	"gavincabbage.com/stegosaurus/lsb"
+	"github.com/gavincabbage/stegosaurus/lsb"
 )
 
 type Encoder struct {
 	key []byte
 }
 
-func NewEncoder(_ string, key []byte) Encoder {
+func NewEncoder(key []byte) Encoder {
 	return Encoder{
 		key: key,
 	}

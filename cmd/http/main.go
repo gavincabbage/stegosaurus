@@ -13,9 +13,9 @@ import (
 	"syscall"
 	"time"
 
-	"gavincabbage.com/stegosaurus/image"
+	"github.com/gavincabbage/stegosaurus/image"
 
-	"gavincabbage.com/stegosaurus"
+	"github.com/gavincabbage/stegosaurus"
 )
 
 func main() {
@@ -108,7 +108,7 @@ func encode() http.Handler {
 		switch r.Header.Get("Content-Type") {
 		case "image/png", "image/jpeg":
 			w.Header().Set("Content-Type", "image/png")
-			encoder = image.NewEncoder("", key)
+			encoder = image.NewEncoder(key)
 		default:
 			http.Error(w, http.StatusText(http.StatusUnsupportedMediaType), http.StatusUnsupportedMediaType)
 			return
@@ -147,7 +147,7 @@ func decode() http.Handler {
 		switch r.Header.Get("Content-Type") {
 		case "image/png":
 			w.Header().Set("Content-Type", "text/plain; charset=utf-8")
-			decoder = image.NewEncoder("", key)
+			decoder = image.NewEncoder(key)
 		default:
 			http.Error(w, http.StatusText(http.StatusUnsupportedMediaType), http.StatusUnsupportedMediaType)
 			return

@@ -10,8 +10,7 @@ import (
 
 	"github.com/urfave/cli"
 
-	"gavincabbage.com/stegosaurus"
-	"gavincabbage.com/stegosaurus/image"
+	"github.com/gavincabbage/stegosaurus/image"
 )
 
 var version = "dev"
@@ -134,9 +133,8 @@ func encode(ctx *cli.Context) (err error) {
 	}
 
 	var (
-		algorithm = stegosaurus.Algorithm(ctx.String("algorithm"))
-		key       = []byte(ctx.String("key"))
-		encoder   = image.NewEncoder(algorithm, key)
+		key     = []byte(ctx.String("key"))
+		encoder = image.NewEncoder(key)
 	)
 	if err = encoder.Encode(p, c, w); err != nil {
 		return err
@@ -184,9 +182,8 @@ func decode(ctx *cli.Context) (err error) {
 	}
 
 	var (
-		algorithm = stegosaurus.Algorithm(ctx.String("algorithm"))
-		key       = []byte(ctx.String("key"))
-		encoder   = image.NewEncoder(algorithm, key)
+		key     = []byte(ctx.String("key"))
+		encoder = image.NewEncoder(key)
 	)
 	if err = encoder.Decode(r, w); err != nil {
 		return err
