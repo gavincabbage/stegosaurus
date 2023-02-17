@@ -95,7 +95,7 @@ func main() {
 			filename := fmt.Sprintf("%s/%s.%s", path, t.name, t.fmt)
 			file, err := os.Create(filename)
 			if err != nil {
-				return fmt.Errorf("opening %s for creation: %w", filename, err)
+				return fmt.Errorf("opening %s for creation: %v", filename, err)
 			}
 			defer func() {
 				if e := file.Close(); e != nil && err == nil {
@@ -107,7 +107,7 @@ func main() {
 			if t.color == nil {
 				src = randomImage(t.width, t.height)
 			} else {
-				src = &image.Uniform{t.color}
+				src = &image.Uniform{C: t.color}
 			}
 
 			draw.Draw(t.img, t.img.Bounds(), src, src.Bounds().Min, draw.Src)

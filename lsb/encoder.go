@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 )
 
 const mask = 0x01
@@ -44,32 +43,30 @@ func (_ Encoder) Encode(payload, carrier io.Reader, result io.Writer) error {
 
 		_, err = result.Write(r)
 		if err != nil {
-			return fmt.Errorf("writing result: %w", err)
+			return fmt.Errorf("writing result: %v", err)
 		}
 	}
 
-	b, err := ioutil.ReadAll(carrier)
+	b, err := io.ReadAll(carrier)
 	if err != nil {
-		return fmt.Errorf("reading remaining carrier: %w", err)
+		return fmt.Errorf("reading remaining carrier: %v", err)
 	}
 
 	_, err = result.Write(b)
 	if err != nil {
-		return fmt.Errorf("writing remaining carrier: %w", err)
+		return fmt.Errorf("writing remaining carrier: %v", err)
 	}
 
 	return nil
 }
 
 func (_ Encoder) Decode(data io.Reader, result io.Writer) error {
-	var (
-		d = make([]byte, 8)
-	)
+	var d = make([]byte, 8)
 	for {
 		n, err := data.Read(d)
 		if n < 8 {
 			if err != nil && err != io.EOF {
-				return fmt.Errorf("reading data: %w", err)
+				return fmt.Errorf("reading data: %v", err)
 			}
 
 			break
@@ -85,7 +82,7 @@ func (_ Encoder) Decode(data io.Reader, result io.Writer) error {
 
 		_, err = result.Write([]byte{b})
 		if err != nil {
-			return fmt.Errorf("writing result: %w", err)
+			return fmt.Errorf("writing result: %v", err)
 		}
 	}
 
