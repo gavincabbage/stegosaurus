@@ -16,8 +16,7 @@ COPY . .
 
 RUN go build -o stegosaurus cmd/stegosaurus/main.go
 
-FROM scratch
+FROM alpine
 
 COPY --from=build stegosaurus .
-
-ENTRYPOINT ["/stegosaurus"]
+COPY --from=build pipeline/encode .

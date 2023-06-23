@@ -1,0 +1,19 @@
+#!/usr/bin/env sh
+
+job="${PACH_DATUM_jobs_JOIN_ON}"
+
+let payload
+for f in "pfs/payloads/${jobs}.*"
+do
+  payload="${f}"
+  break # should only be one
+done
+
+let carrier
+for f in "pfs/carriers/${jobs}.*"
+do
+  carrier="${f}"
+  break # should only be one
+done
+
+./stegosaurus encode -c "${carrier}" -p "${payload}" -o "pfs/out/encoded_${carrier}"

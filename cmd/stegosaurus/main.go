@@ -94,7 +94,7 @@ func encode(ctx *cli.Context) (err error) {
 	var p io.Reader = os.Stdin
 	if payload := ctx.String("payload"); payload != "" {
 		if strings.HasPrefix(payload, "@") {
-			d, err := ioutil.ReadFile(strings.TrimPrefix(payload, "@"))
+			d, err := os.ReadFile(strings.TrimPrefix(payload, "@"))
 			if err != nil {
 				return err
 			}
@@ -104,7 +104,7 @@ func encode(ctx *cli.Context) (err error) {
 		}
 	}
 
-	b, err := ioutil.ReadFile(ctx.String("carrier"))
+	b, err := os.ReadFile(ctx.String("carrier"))
 	if err != nil {
 		return err
 	}

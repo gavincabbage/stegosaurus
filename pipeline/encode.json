@@ -1,0 +1,31 @@
+{
+  "pipeline": {
+    "name": "encode"
+  },
+  "description": "Encode payloads into images",
+  "transform": {
+    "cmd": [ "./encode"],
+    "image": "encode"
+  },
+  "input": {
+    "name": "jobs",
+    "join": [
+      {
+        "pfs": {
+          "repo": "carriers",
+          "branch": "master",
+          "glob": "/(*).*",
+          "join_on": "$1"
+        }
+      },
+      {
+        "pfs": {
+          "repo": "payloads",
+          "branch": "master",
+          "glob": "/(*).*",
+          "join_on": "$1"
+        }
+      }
+    ]
+  }
+}
